@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modal Constraint Threat Analyzer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">MC</div>
+          <div>
+            <h1>Modal Constraint Threat Analyzer</h1>
+            <p>Formal modeling workspace</p>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Modeling Elements</h2>
+          </div>
+          <div class="tool-grid" id="toolbox">
+            <button class="tool" draggable="true" data-type="Role"><span class="mini-shape mini-role"></span>Role</button>
+            <button class="tool" draggable="true" data-type="Actor"><span class="mini-shape mini-agent"></span>Actor</button>
+            <button class="tool" draggable="true" data-type="Task"><span class="mini-shape mini-task"></span>Task</button>
+            <button class="tool" draggable="true" data-type="Asset"><span class="mini-shape mini-asset"></span>Asset</button>
+            <button class="tool" draggable="true" data-type="Scenario"><span class="mini-shape mini-scenario"></span>Scene</button>
+          </div>
+          <p class="hint">Double-click an element to choose a relationship.</p>
+          <div class="hidden" aria-hidden="true">
+            <select id="relationType">
+              <option value="modal_M_P">M,P</option>
+              <option value="modal_M_N">M,N</option>
+              <option value="modal_S_P">S,P</option>
+              <option value="modal_S_N">S,N</option>
+              <option value="modal_Sh_P">Sh,P</option>
+              <option value="modal_Sh_N">Sh,N</option>
+              <option value="modal_C_P">C,P</option>
+              <option value="modal_C_N">C,N</option>
+              <option value="modal_M_P_Y">M,P,Y</option>
+              <option value="modal_M_N_Y">M,N,Y</option>
+              <option value="modal_S_P_Y">S,P,Y</option>
+              <option value="modal_S_N_Y">S,N,Y</option>
+              <option value="plays">play</option>
+              <option value="executes">execute</option>
+              <option value="possesses">possess</option>
+              <option value="needs">need</option>
+              <option value="generates">generate</option>
+              <option value="owns">own</option>
+              <option value="depends">depend</option>
+              <option value="delegates">delegate</option>
+              <option value="delegatePermission">delegatePermission</option>
+              <option value="delegateObligation">delegateObligation</option>
+              <option value="subordinate">subordinate</option>
+              <option value="authority">authority</option>
+              <option value="trust">trust</option>
+              <option value="externalCooperation">ex_cooperation</option>
+              <option value="appliesTo">appliesTo</option>
+              <option value="constrains">constrains</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Workflow</h2>
+          </div>
+          <div class="action-list">
+            <button class="primary-button" id="loadSample">Load Fig. 4 Example</button>
+            <button class="secondary-button" id="validateModel">Validate Model</button>
+            <button class="secondary-button" id="runScenarioInference">Run Scenario Inference</button>
+            <button class="secondary-button" id="runInference">Run Threat Detection</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Files</h2>
+          </div>
+          <div class="action-list compact-actions">
+            <button class="secondary-button" id="exportModel">Export Model</button>
+            <button class="secondary-button" id="saveServerModel">Save Model</button>
+            <button class="secondary-button" id="saveDiagramImage">Save Diagram Image</button>
+            <label class="secondary-button file-button">
+              Import Model
+              <input id="importModel" type="file" accept="application/json" />
+            </label>
+            <button class="secondary-button" id="exportThreatResult">Export Threat Result</button>
+            <button class="secondary-button" id="exportReport">Export Report</button>
+            <button class="ghost-button" id="clearWorkspace">Clear Workspace</button>
+          </div>
+        </section>
+      </aside>
+
+      <div class="panel-resizer panel-resizer-left" data-resize-panel="left" role="separator" aria-label="Resize left panel"></div>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <h2>Scenario Workspace</h2>
+            <p>Drag elements onto the canvas, connect them, and run rule-based inference.</p>
+          </div>
+          <div class="canvas-toolbar" role="toolbar" aria-label="Canvas tools">
+            <button class="toolbar-button" id="undoAction" type="button" title="Undo">Undo</button>
+            <button class="toolbar-button" id="redoAction" type="button" title="Redo">Redo</button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-button active" id="selectMode" type="button">Select</button>
+            <button class="toolbar-button" id="connectMode" type="button">Connect</button>
+            <button class="toolbar-button" id="gridToggle" type="button" title="Grid and snap">Grid</button>
+            <span class="toolbar-divider"></span>
+            <button class="toolbar-button icon-button" id="zoomOut" type="button" title="Zoom out">-</button>
+            <span class="zoom-readout" id="zoomReadout">100%</span>
+            <button class="toolbar-button icon-button" id="zoomIn" type="button" title="Zoom in">+</button>
+            <button class="toolbar-button" id="fitView" type="button">Fit</button>
+          </div>
+          <div class="status-strip">
+            <span><strong id="nodeCount">0</strong> Nodes</span>
+            <span><strong id="edgeCount">0</strong> Relations</span>
+            <span><strong id="findingCount">0</strong> Threat Result</span>
+          </div>
+        </header>
+
+        <section class="canvas-wrap">
+          <div class="canvas-stage" id="canvasStage">
+            <svg class="edge-layer" id="edgeLayer"></svg>
+            <div class="canvas" id="canvas" aria-label="Scenario modeling canvas"></div>
+          </div>
+        </section>
+      </main>
+
+      <div class="panel-resizer panel-resizer-right" data-resize-panel="right" role="separator" aria-label="Resize right panel"></div>
+
+      <aside class="inspector">
+        <section class="panel inspector-panel">
+          <div class="panel-header">
+            <h2>Inspector</h2>
+          </div>
+          <form id="nodeInspector" class="inspector-form hidden">
+            <label class="field">
+              <span>Name</span>
+              <input id="nodeName" type="text" />
+            </label>
+            <label class="field">
+              <span>Type</span>
+              <input id="nodeType" type="text" disabled />
+            </label>
+            <label class="field constraint-only">
+              <span>Modal Type</span>
+              <select id="modalType">
+                <option value="Obligation">Obligation</option>
+                <option value="Recommendation">Recommendation</option>
+                <option value="Permission">Permission</option>
+                <option value="Ability">Ability</option>
+              </select>
+            </label>
+            <label class="field constraint-only">
+              <span>Polarity</span>
+              <select id="polarity">
+                <option value="Positive">Positive</option>
+                <option value="Negative">Negative</option>
+                <option value="Uncertain">Uncertain</option>
+                <option value="PositiveUncertain">Positive + Uncertain</option>
+              </select>
+            </label>
+            <label class="field constraint-only">
+              <span>Action Type</span>
+              <select id="actionType">
+                <option value="Execute">Execute</option>
+                <option value="Possess">Possess</option>
+              </select>
+            </label>
+            <label class="field agent-only">
+              <span>Security Awareness</span>
+              <select id="awareness">
+                <option value="">None</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+              </select>
+            </label>
+            <label class="field scenario-only">
+              <span>Scene Complexity</span>
+              <select id="complexity">
+                <option value="">None</option>
+                <option value="High">High</option>
+                <option value="Low">Low</option>
+              </select>
+            </label>
+            <div class="size-grid">
+              <label class="field">
+                <span>Width</span>
+                <input id="nodeWidth" type="number" min="40" max="1200" step="10" />
+              </label>
+              <label class="field">
+                <span>Height</span>
+                <input id="nodeHeight" type="number" min="30" max="900" step="10" />
+              </label>
+            </div>
+            <label class="field">
+              <span>Description</span>
+              <input id="description" type="text" />
+            </label>
+            <button type="button" class="danger-button" id="deleteNode">Delete Node</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Relations</h2>
+          </div>
+          <div class="relation-list" id="relationList"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Threat Result</h2>
+          </div>
+          <div class="findings" id="findings"></div>
+        </section>
+
+        </aside>
+    </div>
+
+    <script src="modeling-domain.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
