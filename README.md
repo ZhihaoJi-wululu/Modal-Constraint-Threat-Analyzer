@@ -1,6 +1,6 @@
 # Modal Constraint Threat Analyzer
 
-Browser-based formal modeling workspace plus a Python rule engine for modal-constraint social engineering threat detection.
+Browser-based formal modeling workspace for modal-constraint social engineering threat detection.
 
 ## Run
 
